@@ -36,12 +36,24 @@ module istio {
         namespace_node_selector = jsonencode(var.istio_system_namespace_node_selector)
       })
     },
+
+    // public gateway
     {
       patch = templatefile("${path.module}/patches/istio-gateway/namespace.yaml.tftpl",{
         namespace_tolerations = jsonencode(var.istio_gateway_namespace_tolerations)
         namespace_node_selector = jsonencode(var.istio_gateway_namespace_node_selector)
       })
     },
+
+    {
+      patch = templatefile("${path.module}/patches/istio-gateway/service.yaml.tftpl",{
+        resource_group_name = var.resource_group_name
+        public_ip = azurerm_public_ip.public_gateway.ip_address
+      })
+    },
+    
+
+    // private gateway
     {
       patch = templatefile("${path.module}/patches/istio-gateway-private/namespace.yaml.tftpl",{
         namespace_tolerations = jsonencode(var.istio_gateway_namespace_tolerations)
@@ -49,14 +61,8 @@ module istio {
       })
     },
     {
-      patch = templatefile("${path.module}/patches/istio-gateway/service-private.yaml.tftpl",{
+      patch = templatefile("${path.module}/patches/istio-gateway-private/service.yaml.tftpl",{
         private_ip = var.private_gateway_reserved_ip
-      })
-    },
-    {
-      patch = templatefile("${path.module}/patches/istio-gateway/service-public.yaml.tftpl",{
-        resource_group_name = var.resource_group_name
-        public_ip = azurerm_public_ip.public_gateway.ip_address
       })
     },
   ]
