@@ -16,6 +16,14 @@ module istio {
       })
     },
 
+    //discovery
+    {
+      patch = templatefile("${path.module}/patches/istio-discovery/deployment.yaml.tftpl",{
+        cpu_request = jsonencode(var.istio_discovery_cpu_request)
+        memory_request = jsonencode(var.istio_discovery_memory_request)
+      })
+    },
+
     // public gateway
     {
       patch = templatefile("${path.module}/patches/istio-gateway/namespace.yaml.tftpl",{
