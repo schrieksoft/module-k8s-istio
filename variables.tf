@@ -11,7 +11,6 @@ variable "istio_gateway_namespace_node_selector" {
   default = "priority=regular"
 }
 
-variable "enable_private_gateway" { default = false }
 variable "resource_group_name" {}
 variable "location" {}
 variable "ingress_subnet_id" {}

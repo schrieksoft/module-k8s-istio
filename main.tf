@@ -1,12 +1,12 @@
-
-locals {
-  absolute_paths = merge([
+module "istio" {
+  source         = "github.com/schrieksoft/module-kustomization.git?ref=main"
+  absolute_paths =  [
     "${path.root}/manifests/istio-base",
     "${path.root}/manifests/istio-discovery",
-    "${path.root}/manifests/istio-gateway"
-  ], var.enable_private_gateway ? ["${path.root}/manifests/istio-gateway-private"] : [])
-
-  patches = merge([
+    "${path.root}/manifests/istio-gateway",
+    //"${path.root}/manifests/istio-gateway-private"
+  ]
+  patches        = [
     {
       patch = templatefile("${path.module}/patches/istio-base/namespace.yaml.tftpl", {
         namespace_tolerations   = jsonencode(var.istio_system_namespace_tolerations)
@@ -36,21 +36,18 @@ locals {
         public_ip           = var.public_gateway_ip
       })
     },
-    ], var.enable_private_gateway ? [ // private gateway
-    {
-      patch = templatefile("${path.module}/patches/istio-gateway-private/namespace.yaml.tftpl", {
-        namespace_tolerations   = jsonencode(var.istio_gateway_namespace_tolerations)
-        namespace_node_selector = jsonencode(var.istio_gateway_namespace_node_selector)
-      })
-    },
-    {
-      patch = templatefile("${path.module}/patches/istio-gateway-private/service.yaml.tftpl", {
-        private_ip = var.private_gateway_reserved_ip
-      })
-  }, ] : [])
-}
-module "istio" {
-  source         = "github.com/schrieksoft/module-kustomization.git?ref=main"
-  absolute_paths = local.absolute_paths
-  patches        = local.patches
+
+    # // private gateway
+    #   {
+    #     patch = templatefile("${path.module}/patches/istio-gateway-private/namespace.yaml.tftpl", {
+    #       namespace_tolerations   = jsonencode(var.istio_gateway_namespace_tolerations)
+    #       namespace_node_selector = jsonencode(var.istio_gateway_namespace_node_selector)
+    #     })
+    #   },
+    #   {
+    #     patch = templatefile("${path.module}/patches/istio-gateway-private/service.yaml.tftpl", {
+    #       private_ip = var.private_gateway_reserved_ip
+    #     })
+    #   }
+    ]
 }
