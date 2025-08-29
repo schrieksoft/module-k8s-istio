@@ -1,5 +1,5 @@
 module "istio" {
-  source         = "github.com/schrieksoft/module-kustomization.git?ref=main"
+  source         = "github.com/schrieksoft/module-kustomization.git?ref=1.0.0"
   absolute_paths =  [
     "${path.root}/manifests/istio-base",
     "${path.root}/manifests/istio-discovery",
